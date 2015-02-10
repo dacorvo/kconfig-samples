@@ -1,0 +1,5 @@
+config BAR
+    bool "Bar module"
+    select FOO
+    help
+        The notorious Bar module

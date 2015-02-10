@@ -1,0 +1,8 @@
+config BAZ
+    bool "Baz module"
+    depends on BAR
+    help
+        The popular Baz module
+
+comment "The Baz module requires the Bar module"
+    depends on !BAR

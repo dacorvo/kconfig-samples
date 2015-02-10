@@ -1,2 +1,2 @@
 # Create rules for this module based on module template
-$(eval $(call MODULE_template,foo))
+$(eval $(call MODULE_template,foo,FOO))

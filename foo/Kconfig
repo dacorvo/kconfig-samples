@@ -1,0 +1,4 @@
+config FOO
+    bool "Foo module"
+    help
+        The infamous Foo module
