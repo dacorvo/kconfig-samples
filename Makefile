@@ -11,7 +11,12 @@ KCONFIG := Kconfig
 KCONFIG_MCONF := $(shell which mconf)
 
 # The resulting configuration file
-CONFIG := .config
+KCONFIG_CONFIG := $(BUILD_DIR)/.config
+
+# The environment to export before running Kconfig tools,
+# allowing to control their output
+KCONFIG_ENV := \
+	KCONFIG_CONFIG=$(KCONFIG_CONFIG)
 
 # A minimal module template, to be evaluated from module makefiles
 # Takes the module name as the first parameter
@@ -30,7 +35,7 @@ endef
 all:
 
 # Include the project configuration file
--include $(CONFIG)
+-include $(KCONFIG_CONFIG)
 
 # Include all module makefiles
 include ./*/*.mk
@@ -44,7 +49,7 @@ clean:
 
 menuconfig:
 ifdef KCONFIG_MCONF
-	$(KCONFIG_MCONF) $(KCONFIG)
+	$(KCONFIG_ENV) $(KCONFIG_MCONF) $(KCONFIG)
 else
 	@echo "The menuconfig target requires Kconfig's mconf"
 endif
