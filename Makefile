@@ -1,8 +1,8 @@
-# Override default output directory with O=/path/to/output on the command line
-O ?= output
+# Override default output directory with OUT=/path/to/output on the command line
+OUT ?= output
 
 # Create output dir
-BUILD_DIR := $(shell mkdir -p $(O) && cd $(O) > /dev/null && pwd)
+OUT := $(shell mkdir -p $(OUT) && cd $(OUT) > /dev/null && pwd)
 
 # The root Kconfig file
 KCONFIG := Kconfig
@@ -15,8 +15,8 @@ KCONFIG_CONF := $(shell which conf)
 
 # The Kconfig output files directory
 KCONFIG_DIR := \
-	$(shell mkdir -p $(BUILD_DIR)/config \
-	&& cd $(BUILD_DIR)/config > /dev/null \
+	$(shell mkdir -p $(OUT)/config \
+	&& cd $(OUT)/config > /dev/null \
 	&& pwd)
 
 # Kconfig "menuconfig" output file
@@ -35,34 +35,15 @@ KCONFIG_ENV := \
 	KCONFIG_AUTOHEADER=$(KCONFIG_AUTOHEADER) \
 	KCONFIG_TRISTATE=$(KCONFIG_TRISTATE)
 
-# A minimal module template, to be evaluated from module makefiles
-# Takes the module name as the first parameter
-define MODULE_template
-ifeq ($(CONFIG_$(2)),y)
-MODULES += $(1)
-$(1): $(BUILD_DIR)/$(1)/.built
-$(BUILD_DIR)/$(1)/.built:
-	@echo "Building $(1)"
-	@mkdir -p $(BUILD_DIR)/$(1)
-	@touch $(BUILD_DIR)/$(1)/.built
-endif
-endef
-
 # We have to reference the 'all' rule to make it the default
 all:
 
-# Include the project configuration file
--include $(KCONFIG_CONFIG)
-
-# Include all module makefiles
-include ./*/*.mk
-
 # Generic rules
-all: $(MODULES)
+all: build
 	@echo "Done"
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(OUT)
 
 menuconfig:
 ifdef KCONFIG_MCONF
@@ -80,3 +61,9 @@ ifdef KCONFIG_CONF
 else
 	@echo "The config target requires Kconfig's conf"
 endif
+
+build: $(KCONFIG_AUTOCONFIG) $(KCONFIG_AUTOHEADER) $(KCONFIG_TRISTATE)
+	$(MAKE) -f Makefile.build 	\
+		DIR=.					\
+		OUT=$(OUT)				\
+		AUTOCONFIG=$(KCONFIG_AUTOCONFIG)
