@@ -56,8 +56,7 @@ config: $(KCONFIG_CONFIG)
 ifdef KCONFIG_CONF
 	@install -d include/config
 	$(KCONFIG_ENV) $(KCONFIG_CONF) --silentoldconfig $(KCONFIG)
-	@mv include/config/* $(KCONFIG_DIR)
-	@rm -rf include
+	@rm -rf include/config
 else
 	@echo "The config target requires Kconfig's conf"
 endif
@@ -66,4 +65,5 @@ build: $(KCONFIG_AUTOCONFIG) $(KCONFIG_AUTOHEADER) $(KCONFIG_TRISTATE)
 	$(MAKE) -f Makefile.build 	\
 		DIR=.					\
 		OUT=$(OUT)				\
-		AUTOCONFIG=$(KCONFIG_AUTOCONFIG)
+		AUTOCONFIG=$(KCONFIG_AUTOCONFIG) \
+		T=$(CURDIR)

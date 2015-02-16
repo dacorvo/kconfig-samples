@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void qux();
+#include "baz/qux/qux.h"
 
 void qux() {
     printf("Qux called\n");

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void foo();
+#include "foo/foo.h"
 
 void bar() {
     printf("Bar called\n");

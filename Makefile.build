@@ -98,13 +98,15 @@ $(subdir-y):
 # Step 4: Define rules to build objects in this directory
 # =============================================================================
 
+CFLAGS := $(CFLAGS) -I$(T)/include -I$(OUT)/config
+
 # Create directory
 $(OUT)/$(DIR):
 	mkdir -p $@
 
 # Build C files
 $(OUT)/$(DIR)/%.o: $(DIR)/%.c
-	$(CC) $(c_flags) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 # Create an archive with all objects
 $(OUT)/$(DIR)/built-in.o: $(obj-y)
