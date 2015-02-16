@@ -1,0 +1,4 @@
+config BAZ_QUX
+    bool "Qux module"
+    help
+        It only exists inside BAZ

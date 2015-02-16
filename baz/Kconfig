@@ -6,3 +6,9 @@ config BAZ
 
 comment "The Baz module requires the Bar module"
     depends on !BAR
+
+if BAZ
+
+source baz/qux/Kconfig
+
+endif
