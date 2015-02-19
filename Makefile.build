@@ -52,7 +52,7 @@ obj-y :=
 #
 # The output of this phase is contained in:
 # - obj-y:
-#   A list of objects to be bundled into a built-in.o archive representing the
+#   A list of objects to be bundled into a built-in.o aggregated representing the
 #   recursive conditional build of this directory
 # - subdir-obj-y:
 #   A list of dir/built-in.o to be obtained as a result of the recursive
@@ -68,10 +68,10 @@ subdir-y	+= $(__subdir-y)
 subdir-y	:= $(sort $(subdir-y))
 
 # Next, update the list of objects, replacing any specified directory by the
-# archive object that will be produced when descending into it
+# aggregated object that will be produced when descending into it
 obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
 
-# Remember the list of these archive objects, that will be used as a dependency
+# Remember the list of these aggregated objects, that will be used as a dependency
 # to trigger the recursion into subdirectories
 subdir-obj-y := $(filter %/built-in.o, $(obj-y))
 
@@ -86,7 +86,7 @@ subdir-obj-y := $(addprefix $(OUT)/$(DIR)/,$(subdir-obj-y))
 # Step 3: Define rules to descend into subdirectories
 # =============================================================================
 
-# Tell make to descend into subdirs to build the corresponding archive objects
+# Tell make to descend into subdirs to build the corresponding aggregated objects
 $(sort $(subdir-obj-y)): $(subdir-y) ;
 
 PHONY += $(subdir-y)
@@ -108,9 +108,9 @@ $(OUT)/$(DIR):
 $(OUT)/$(DIR)/%.o: $(DIR)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Create an archive with all objects
+# Create an aggregated object
 $(OUT)/$(DIR)/built-in.o: $(obj-y)
-	$(AR) rcs $@ $^
+	$(LD) $(LD_FLAGS) -r -o $@ $^
 
 # =============================================================================
 # Step 5: Let's build
