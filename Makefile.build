@@ -106,7 +106,18 @@ $(subdir-y):
 # Step 4: Define rules to build objects in this directory
 # =============================================================================
 
-CFLAGS := $(CFLAGS) -I$(INC_ROOT) -I$(OUT)/config
+# Include dependency files that may have been produced by a previous build
+-include $(OUT)/$(DIR)/*.d
+
+# We may not be compiling from the directory itself, so add it to the include
+# search path
+OUR_CFLAGS := -I$(DIR)
+# Also add the top-level include directive
+OUR_CFLAGS += -I$(INC_ROOT)
+# Also add the path to the global configuration header
+OUR_CFLAGS += -I$(OUT)/config
+# Tell gcc to generate dependency files
+OUR_CFLAGS += -MD
 
 # Create directory
 $(OUT)/$(DIR):
@@ -114,7 +125,7 @@ $(OUT)/$(DIR):
 
 # Build C files
 $(OUT)/$(DIR)/%.o: $(DIR)/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(OUR_CFLAGS) -c -o $@ $<
 
 # Create an aggregated object
 $(OUT)/$(DIR)/built-in.o: $(obj-y)
