@@ -6,6 +6,7 @@
 #  <DIR>        is the directory you want to build, relative from the tree top
 #  <OUT>        is the path to the out-of-tree build directory
 #  <AUTOCONFIG> is the path to the Kconfig auto.conf file
+#  <INC_ROOT>   is the path to the root include directories
 # =============================================================================
 
 ifndef DIR
@@ -17,6 +18,9 @@ OUT ?= .
 
 # If no auto.conf file was specified, assume default
 AUTOCONFIG ?= $(OUT)/config/auto.conf
+
+# If no include root path specfied, assume current directory
+INC_ROOT ?= $(CURDIR)
 
 # This will eventually trigger everything
 all:
@@ -92,13 +96,17 @@ $(sort $(subdir-obj-y)): $(subdir-y) ;
 PHONY += $(subdir-y)
 $(subdir-y):
 	@echo "Descending into directory $@"
-	$(MAKE) -f Makefile.build DIR=$@
+	$(MAKE) -f Makefile.build	 \
+		DIR=$@					 \
+		OUT=$(OUT)				 \
+		AUTOCONFIG=$(AUTOCONFIG) \
+		INC_ROOT=$(INC_ROOT)
 
 # =============================================================================
 # Step 4: Define rules to build objects in this directory
 # =============================================================================
 
-CFLAGS := $(CFLAGS) -I$(T)/include -I$(OUT)/config
+CFLAGS := $(CFLAGS) -I$(INC_ROOT) -I$(OUT)/config
 
 # Create directory
 $(OUT)/$(DIR):
