@@ -1,0 +1,48 @@
+======================================================================================
+= Sample project ilustrating how to create configurable builds using Kconfig/Kbuild. 
+=
+= David Corvoysier copyright Intel 2015
+======================================================================================
+
+The build can be configured to compile only some modules under the src directory.
+The configuration rules are recursively defined in Kconfig files using the Kconfig
+syntax:
+    https://www.kernel.org/doc/Documentation/kbuild/kconfig-language.txt
+
+Creating the build configuration requires Kconfig's mconf and conf tools, available
+for instance from the kconfig-frontends package:
+    http://ymorin.is-a-geek.org/projects/kconfig-frontends  
+
+Once a configuration has been defined, the build applies it using rules defined in
+recursive Kbuild.mk makefiles, following the Linux kernel convention for files and
+directories selection, and conditioned by the configuration:
+    obj-${CONFIG_FOO} += foo.o
+    obj-${CONFIG_BAR} += bar/
+
+The project build tree can be extended by specifying an additional external path to
+explore when parsing the configuration. At this path, the build system expects a
+valid Kconfig/Kbuild.mk pair (see the example under external/sample).
+
+Note: you need to use an absolute path. 
+
+============
+How to build
+============
+
+Without external services:
+
+make menuconfig
+make config
+make
+
+With external services:
+
+EXTERNAL_SERVICES=/path/to/ext make menuconfig
+EXTERNAL_SERVICES=/path/to/ext make config
+make
+
+For instance:
+
+EXTERNAL_SERVICES=$(pwd)/external/sample make menuconfig
+EXTERNAL_SERVICES=$(pwd)/external/sample make config
+make
