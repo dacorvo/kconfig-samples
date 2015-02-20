@@ -1,0 +1,3 @@
+source "src/foo/Kconfig"
+source "src/bar/Kconfig"
+source "src/baz/Kconfig"

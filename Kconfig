@@ -1,8 +1,6 @@
 mainmenu "Sample configurable project using Kconfig"
 
-source "foo/Kconfig"
-source "bar/Kconfig"
-source "baz/Kconfig"
+source "src/Kconfig"
 
 config EXTERNAL_SERVICES
     string

@@ -9,6 +9,6 @@ comment "The Baz module requires the Bar module"
 
 if BAZ
 
-source baz/qux/Kconfig
+source src/baz/qux/Kconfig
 
 endif
