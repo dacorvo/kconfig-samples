@@ -3,3 +3,14 @@ mainmenu "Sample configurable project using Kconfig"
 source "foo/Kconfig"
 source "bar/Kconfig"
 source "baz/Kconfig"
+
+config EXTERNAL_SERVICES
+    string
+    option env="EXTERNAL_SERVICES"
+
+config EXT_SVC_PATH
+    string
+    depends on EXTERNAL_SERVICES != "external/none"
+    default EXTERNAL_SERVICES
+
+source "$EXTERNAL_SERVICES/Kconfig"

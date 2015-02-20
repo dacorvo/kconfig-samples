@@ -4,6 +4,9 @@ OUT ?= output
 # Create output dir
 OUT := $(shell mkdir -p $(OUT) && cd $(OUT) > /dev/null && pwd)
 
+# By default, define external services Kconfig file as our dummy
+EXTERNAL_SERVICES ?= external/none
+
 # The root Kconfig file
 KCONFIG := Kconfig
 
@@ -33,7 +36,8 @@ KCONFIG_ENV := \
 	KCONFIG_CONFIG=$(KCONFIG_CONFIG) \
 	KCONFIG_AUTOCONFIG=$(KCONFIG_AUTOCONFIG) \
 	KCONFIG_AUTOHEADER=$(KCONFIG_AUTOHEADER) \
-	KCONFIG_TRISTATE=$(KCONFIG_TRISTATE)
+	KCONFIG_TRISTATE=$(KCONFIG_TRISTATE) \
+	EXTERNAL_SERVICES=$(EXTERNAL_SERVICES)
 
 # We have to reference the 'all' rule to make it the default
 all:

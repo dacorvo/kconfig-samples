@@ -1,0 +1,8 @@
+config EXT1
+    bool "First external module"
+    select FOO
+
+config EXT2
+    bool "Second external module"
+    depends on BAR
+    depends on EXT1
