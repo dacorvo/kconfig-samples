@@ -30,6 +30,9 @@ KCONFIG_AUTOCONFIG := $(KCONFIG_DIR)/auto.conf
 KCONFIG_AUTOHEADER := $(KCONFIG_DIR)/autoconf.h
 KCONFIG_TRISTATE := $(KCONFIG_DIR)/tristate.config
 
+# Kconfig "defconfig" output file
+KCONFIG_DEFCONFIG := $(KCONFIG_DIR)/defconfig
+
 # The environment to export before running Kconfig tools,
 # allowing to control their output
 KCONFIG_ENV := \
@@ -58,6 +61,7 @@ endif
 
 config: $(KCONFIG_CONFIG)
 ifdef KCONFIG_CONF
+	@echo "Producing configuration files for build"
 	@install -d include/config
 	$(KCONFIG_ENV) $(KCONFIG_CONF) --silentoldconfig $(KCONFIG)
 	@rm -rf include/config
@@ -65,6 +69,10 @@ else
 	@echo "The config target requires Kconfig's conf"
 endif
 
+savedefconfig: $(KCONFIG_CONFIG)
+	@echo "Creating the minimal configuration"
+	$(KCONFIG_ENV) $(KCONFIG_CONF) --savedefconfig defconfig $(KCONFIG)
+	
 build: $(KCONFIG_AUTOCONFIG) $(KCONFIG_AUTOHEADER) $(KCONFIG_TRISTATE)
 	$(MAKE) -f Makefile.build 	\
 		DIR=.					\
