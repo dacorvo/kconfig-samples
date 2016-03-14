@@ -1,0 +1,79 @@
+# =============================================================================
+# Build a target in the specified directory
+# Usage:
+# 	make -f Makefile.build DIR=<DIR> OUT=<OUT> AUTOCONFIG=<AUTOCONFIG>
+# Where:
+#  <DIR>        is the directory you want to build, relative from the tree top
+#  <OUT>        is the path to the out-of-tree build directory
+#  <AUTOCONFIG> is the path to the Kconfig auto.conf file
+#  <INC_ROOT>   is the path to the root include directories
+# =============================================================================
+
+ifndef DIR
+	$(error Incorrect invocation of Makefile.build: DIR unspecified)
+endif
+
+# If no output directory was specified, assume in-tree
+OUT ?= .
+
+# If no auto.conf file was specified, assume default
+AUTOCONFIG ?= $(OUT)/config/auto.conf
+
+# If no include root path specfied, assume current directory
+INC_ROOT ?= $(CURDIR)
+
+# This will eventually trigger everything
+all:
+
+# Read Kconfig's auto.conf if it exists, otherwise ignore
+-include $(AUTOCONFIG)
+
+define subdir_rules
+obj-y :=
+include $(1)/Kbuild.mk
+$(info Entering $(1))
+$(eval prefix := $(subst .,_,$(subst /,_,$(1))))
+$(prefix)_subdir-y := $$(sort $$(patsubst %/,%,$$(filter %/, $$(obj-y))))
+$(prefix)_obj-y := $$(addprefix $(OUT)/$(1)/,$$(patsubst %/, %/built-in.o, $$(obj-y)))
+$(prefix)_subdir-y := $$(addprefix $(1)/,$$($(prefix)_subdir-y))
+-include $(OUT)/$(1)/*.d 
+$(OUT)/$(1)/built-in.o: $$($(prefix)_obj-y)
+	mkdir -p $(OUT)/$(1)
+	$$(LD) $$(LD_FLAGS) -r -o $$@ $$^
+$$(foreach subdir,$$($(prefix)_subdir-y), $$(eval $$(call subdir_rules,$$(subdir))))
+$(OUT)/$(1)/%.o: $(1)/%.c
+	mkdir -p $(OUT)/$(1)
+	$$(CC) $$(CFLAGS) $$(OUR_CFLAGS) -c -o $$@ $$<
+endef
+
+$(eval $(call subdir_rules,$(DIR)))
+
+# =============================================================================
+# Step 4: Define rules to build objects in this directory
+# =============================================================================
+
+# We may not be compiling from the directory itself, so add it to the include
+# search path
+OUR_CFLAGS := -I$(DIR)
+# Also add the top-level include directive
+OUR_CFLAGS += -I$(INC_ROOT)
+# Also add the path to the global configuration header
+OUR_CFLAGS += -I$(OUT)/config
+# Tell gcc to generate dependency files
+OUR_CFLAGS += -MD
+
+# Create directory
+$(OUT)/$(DIR):
+	mkdir -p $@
+
+# Build C files
+$(OUT)/$(DIR)/%.o: $(DIR)/%.c
+	$(CC) $(CFLAGS) $(OUR_CFLAGS) -c -o $@ $<
+
+# =============================================================================
+# Step 5: Let's build
+# =============================================================================
+
+all: $(OUT)/$(DIR) $(OUT)/$(DIR)/built-in.o
+
+.PHONY: $(PHONY)
