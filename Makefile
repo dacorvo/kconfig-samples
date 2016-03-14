@@ -72,7 +72,7 @@ endif
 savedefconfig: $(KCONFIG_CONFIG)
 	@echo "Creating the minimal configuration"
 	$(KCONFIG_ENV) $(KCONFIG_CONF) --savedefconfig defconfig $(KCONFIG)
-	
+
 build: $(KCONFIG_AUTOCONFIG) $(KCONFIG_AUTOHEADER) $(KCONFIG_TRISTATE)
 	$(MAKE) -f Makefile.build 	\
 		DIR=.					\
