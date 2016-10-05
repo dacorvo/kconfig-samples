@@ -1,3 +1,8 @@
+THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+# We have to reference the 'all' rule to make it the default
+all:
+
 # Override default output directory with OUT=/path/to/output on the command line
 OUT ?= output
 
@@ -10,13 +15,23 @@ EXTERNAL_SERVICES ?= external/none
 # The root Kconfig file
 KCONFIG := Kconfig
 
-# The mconf tool used to perform the "menuconfig" step
-KCONFIG_MCONF := $(shell which mconf)
+KCONFIG_SRC := $(THIS_DIR)/kconfig-frontends
+# The Kconfig output files directory
+KCONFIG_TOOLS := $(THIS_DIR)/output/kconfig-frontends
 
 # The conf tool used to perform the "config" step
-KCONFIG_CONF := $(shell which conf)
+KCONFIG_CONF := $(KCONFIG_TOOLS)/frontends/conf/conf
+# The mconf tool used to perform the "menuconfig" step
+KCONFIG_MCONF = $(KCONFIG_TOOLS)/frontends/mconf/mconf
 
-# The Kconfig output files directory
+$(KCONFIG_CONF) $(KCONFIG_MCONF):
+	@mkdir -p $(KCONFIG_TOOLS)
+	@echo "Building kconfig frontends tools"
+	(cd $(KCONFIG_SRC) && bash ./bootstrap)
+	(cd $(KCONFIG_TOOLS) \
+	 && $(KCONFIG_SRC)/configure --disable-nconf --disable-gconf --disable-qconf \
+	 && $(MAKE) )
+
 KCONFIG_DIR := \
 	$(shell mkdir -p $(OUT)/config \
 	&& cd $(OUT)/config > /dev/null \
@@ -42,9 +57,6 @@ KCONFIG_ENV := \
 	KCONFIG_TRISTATE=$(KCONFIG_TRISTATE) \
 	EXTERNAL_SERVICES=$(EXTERNAL_SERVICES)
 
-# We have to reference the 'all' rule to make it the default
-all:
-
 # Generic rules
 all: build
 	@echo "Done"
@@ -52,12 +64,8 @@ all: build
 clean:
 	rm -rf $(OUT)
 
-menuconfig:
-ifdef KCONFIG_MCONF
+menuconfig: $(KCONFIG_MCONF)
 	$(KCONFIG_ENV) $(KCONFIG_MCONF) $(KCONFIG)
-else
-	@echo "The menuconfig target requires Kconfig's mconf"
-endif
 
 config: $(KCONFIG_CONFIG)
 ifdef KCONFIG_CONF
