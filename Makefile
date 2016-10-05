@@ -75,7 +75,7 @@ savedefconfig: $(KCONFIG_CONFIG)
 
 build: $(KCONFIG_AUTOCONFIG) $(KCONFIG_AUTOHEADER) $(KCONFIG_TRISTATE)
 	$(MAKE) -f Makefile.build 	\
-		DIR=.					\
+		SRC=.					\
 		OUT=$(OUT)				\
 		AUTOCONFIG=$(KCONFIG_AUTOCONFIG) \
 		INC_ROOT=$(CURDIR)/include
