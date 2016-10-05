@@ -1,0 +1,6 @@
+built-in.o: $(obj)
+	$(LD) $(LD_FLAGS) -r -o $@ $^
+
+$(OUT)/%.o: $(SRC)/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
