@@ -1,0 +1,3 @@
+[submodule "kconfig-frontends"]
+	path = kconfig-frontends
+	url = https://github.com/kaizouman/kconfig-frontends.git
